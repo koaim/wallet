@@ -4,7 +4,8 @@ const (
 	BrokerageAccounts = "Брокерские счета"
 	Deposits          = "Вклады"
 	SavingAccounts    = "Накопительные счета"
-	Start             = "/start"
+	Cards             = "Карты"
 	Welcome           = "Добро пожаловать"
 	Report            = "Отчёт"
+	Start             = "/start"
 )

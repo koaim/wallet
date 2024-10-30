@@ -10,7 +10,7 @@ import (
 	"github.com/makarychev13/wallet/internal/config"
 	"github.com/makarychev13/wallet/internal/handler"
 	"github.com/makarychev13/wallet/internal/handler/message"
-	accountsdb "github.com/makarychev13/wallet/internal/storage/accounts"
+	brokeragesdb "github.com/makarychev13/wallet/internal/storage/brokerages"
 	"github.com/makarychev13/wallet/internal/usecase/brokerages"
 	"github.com/makarychev13/wallet/pkg/state"
 )
@@ -37,7 +37,7 @@ func main() {
 
 	sm := state.NewMachine(storage)
 
-	accountsDb := accountsdb.New(db)
+	accountsDb := brokeragesdb.New(db)
 	accountsLister := brokerages.NewListUseCase(accountsDb)
 
 	reply := handler.New(api, accountsLister)
@@ -49,6 +49,13 @@ func main() {
 	sm.Register(initState)
 
 	for u := range echotron.PollingUpdates(cfg.TgApiToken) {
+		if u.Message == nil {
+			continue
+		}
+		if u.Message.From.ID != cfg.MyTgID {
+			continue
+		}
+
 		err := sm.Handle(*u.Message)
 		if err != nil {
 			slog.Error("can't send message", "err", err)

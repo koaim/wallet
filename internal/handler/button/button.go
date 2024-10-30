@@ -13,6 +13,7 @@ var (
 				{Text: message.BrokerageAccounts},
 				{Text: message.Deposits},
 				{Text: message.SavingAccounts},
+				{Text: message.Cards},
 			},
 			{
 				{Text: message.Report},

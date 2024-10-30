@@ -1,4 +1,4 @@
-package accounts
+package brokerages
 
 import (
 	"context"
@@ -16,11 +16,11 @@ func New(db *sqlx.DB) *Repo {
 	return &Repo{db: db}
 }
 
-func (r *Repo) All(ctx context.Context) ([]brokerage.Account, error) {
+func (r *Repo) Accounts(ctx context.Context) ([]brokerage.Account, error) {
 	query, args, err :=
 		squirrel.
 			Select("id", "name", "balance").
-			From("accounts").
+			From("brokerage_accounts").
 			OrderBy("id").
 			ToSql()
 	if err != nil {
