@@ -6,6 +6,7 @@ import (
 
 	"github.com/NicoNex/echotron/v3"
 	"github.com/makarychev13/wallet/internal/model/brokerage"
+	"github.com/makarychev13/wallet/internal/model/deposit"
 )
 
 type ErrSendMsg struct {
@@ -30,11 +31,16 @@ type accountLister interface {
 	All(ctx context.Context) ([]brokerage.Account, error)
 }
 
+type depositLister interface {
+	All(ctx context.Context) ([]deposit.Deposit, error)
+}
+
 type Handler struct {
 	accountLister accountLister
+	depositLister depositLister
 	tg            echotron.API
 }
 
-func New(tg echotron.API, accountLister accountLister) *Handler {
-	return &Handler{accountLister: accountLister, tg: tg}
+func New(tg echotron.API, accountLister accountLister, depositLister depositLister) *Handler {
+	return &Handler{accountLister: accountLister, depositLister: depositLister, tg: tg}
 }

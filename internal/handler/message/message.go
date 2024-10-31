@@ -8,4 +8,5 @@ const (
 	Welcome           = "Добро пожаловать"
 	Report            = "Отчёт"
 	Start             = "/start"
+	AddDeposit        = "Добавить депозит"
 )

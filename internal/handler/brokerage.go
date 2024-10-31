@@ -17,6 +17,8 @@ func (h *Handler) BrokerageAccounts(msg echotron.Message) error {
 		if err != nil {
 			return NewErrSendMsg(res, msg.From.ID)
 		}
+
+		return nil
 	}
 	if err != nil {
 		return fmt.Errorf("get accounts: %w", err)

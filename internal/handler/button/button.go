@@ -20,4 +20,13 @@ var (
 			},
 		},
 	}
+
+	AddDeposit = echotron.ReplyKeyboardMarkup{
+		ResizeKeyboard: true,
+		Keyboard: [][]echotron.KeyboardButton{
+			{
+				{Text: message.AddDeposit},
+			},
+		},
+	}
 )

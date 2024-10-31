@@ -9,5 +9,5 @@ var (
 type Account struct {
 	ID      int
 	Name    string
-	Balance int
+	Balance float64
 }

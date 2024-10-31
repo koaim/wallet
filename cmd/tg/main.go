@@ -11,14 +11,16 @@ import (
 	"github.com/makarychev13/wallet/internal/handler"
 	"github.com/makarychev13/wallet/internal/handler/message"
 	brokeragesdb "github.com/makarychev13/wallet/internal/storage/brokerages"
+	depositsdb "github.com/makarychev13/wallet/internal/storage/deposits"
 	"github.com/makarychev13/wallet/internal/usecase/brokerages"
+	"github.com/makarychev13/wallet/internal/usecase/deposits"
 	"github.com/makarychev13/wallet/pkg/state"
 )
 
 func main() {
 	var cfg config.Config
 
-	_, err := toml.DecodeFile("config.toml", &cfg)
+	_, err := toml.DecodeFile("/Users/makarychev/Apps/github.com/makarychev13/wallet/config.toml", &cfg)
 	if err != nil {
 		slog.Error("can't parse config", "err", err)
 		return
@@ -38,13 +40,17 @@ func main() {
 	sm := state.NewMachine(storage)
 
 	accountsDb := brokeragesdb.New(db)
-	accountsLister := brokerages.NewListUseCase(accountsDb)
+	depositsDb := depositsdb.New(db)
 
-	reply := handler.New(api, accountsLister)
+	accountsLister := brokerages.NewListUseCase(accountsDb)
+	depositLister := deposits.NewListUseCase(depositsDb)
+
+	reply := handler.New(api, accountsLister, depositLister)
 
 	initState := state.New(handler.InitState)
 	initState.On(message.Start, reply.Init)
 	initState.On(message.BrokerageAccounts, reply.BrokerageAccounts)
+	initState.On(message.Deposits, reply.ListDeposits)
 
 	sm.Register(initState)
 
@@ -58,7 +64,7 @@ func main() {
 
 		err := sm.Handle(*u.Message)
 		if err != nil {
-			slog.Error("can't send message", "err", err)
+			slog.Error("can't handle message", "err", err)
 		}
 	}
 }
