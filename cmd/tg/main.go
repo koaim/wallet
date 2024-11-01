@@ -14,6 +14,7 @@ import (
 	depositsdb "github.com/makarychev13/wallet/internal/storage/deposits"
 	"github.com/makarychev13/wallet/internal/usecase/brokerages"
 	"github.com/makarychev13/wallet/internal/usecase/deposits"
+	"github.com/makarychev13/wallet/pkg/session"
 	"github.com/makarychev13/wallet/pkg/state"
 )
 
@@ -44,15 +45,29 @@ func main() {
 
 	accountsLister := brokerages.NewListUseCase(accountsDb)
 	depositLister := deposits.NewListUseCase(depositsDb)
+	depositCreator := deposits.NewCreateUseCase(depositsDb)
 
-	reply := handler.New(api, accountsLister, depositLister)
+	reply := handler.New(api, accountsLister, depositLister, depositCreator, session.NewMemory(), storage)
 
 	initState := state.New(handler.InitState)
 	initState.On(message.Start, reply.Init)
 	initState.On(message.BrokerageAccounts, reply.BrokerageAccounts)
 	initState.On(message.Deposits, reply.ListDeposits)
+	initState.On(message.AddDeposit, reply.InitDepositCreating)
 
-	sm.Register(initState)
+	depositNameState := state.New(handler.WaitDepositName)
+	depositNameState.OnText(reply.SetDepositName)
+
+	depositRateState := state.New(handler.WaitDepositRate)
+	depositRateState.OnText(reply.SetDepositRate)
+
+	depositBalanceState := state.New(handler.WaitDepositBalance)
+	depositBalanceState.OnText(reply.CreateDeposit)
+
+	depositPeriodState := state.New(handler.WaitDepositPeriod)
+	depositPeriodState.OnText(reply.SetDepositPeriod)
+
+	sm.Register(initState, depositNameState, depositRateState, depositBalanceState, depositPeriodState)
 
 	for u := range echotron.PollingUpdates(cfg.TgApiToken) {
 		if u.Message == nil {

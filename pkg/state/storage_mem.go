@@ -20,11 +20,11 @@ func (s *MemStorage[T]) Current(id int64) (T, error) {
 	return state, nil
 }
 
-func (s *MemStorage[T]) Set(id int64, name T) error {
+func (s *MemStorage[T]) Set(id int64, state T) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	s.states[id] = name
+	s.states[id] = state
 
 	return nil
 }
